@@ -15,7 +15,7 @@ red = (255, 0, 0)
 blue = (0, 0, 255)
 orange = (255, 125, 0)
 
-colors = {"cyan":cyan,
+colors = {  "cyan":cyan,
             "yellow":yellow,
             "purple":purple,
             "green":green,
@@ -47,6 +47,8 @@ def new_board(width = 10, height = 22, speed = 1):
 
     pygame.display.set_caption("Tetris")
 
+    pygame.mouse.set_visible(False)
+
     board = Board(width, height)
 
     moveCount = 0
@@ -76,11 +78,14 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
                     pause = 1 - pause
+                elif event.key == pygame.K_q:
+                    stop = True
         if stop == False and pause == False:
             board.squares.draw(screen)
             draw_grid(screen, board.width, board.height)
 
             update_text(screen, " Tetris ", board.width, 1)
+            update_text(screen, " Press q to quit", board.width, 2)
 
             pygame.display.flip()
             clock.tick(10 * speed)
@@ -110,6 +115,26 @@ def random_list(width, height):
         list[(c, r)] = i
     return list
 
+class PieceBag:
+    def __init(self):
+        refill_bag()
+
+    def refill_bag(self):
+        self.bag = []
+
+        for x in range(7):
+            self.bag.append(random.randint(0, 6))
+
+        self.remaining = 7
+        pass
+
+    def get_next_piece(self):
+        self.remaining -= 1;
+        return bag.pop()
+
+    def remaining_pieces(self):
+        return remaining
+
 
 class Square(pygame.sprite.Sprite):
     def __init__(self, row, col, color):
@@ -124,11 +149,13 @@ class Square(pygame.sprite.Sprite):
         self.rect.y = get_row_top_loc(row)
 
     def get_rect_from_square(self):
-        return pygame.Rect(get_col_left_loc(self.col), get_rect_from_square(self.row), WIDTH, HEIGHT)
+        return pygame.Rect(get_col_left_loc(self.col), get_row_top_loc(self.row), WIDTH, HEIGHT)
 
     def set_color(self, color):
         self.color = color;
         self.image.fill(self.color)
+    def is_empty(self):
+        return self.color == gray
 
 class Board:
     def __init__(self, width, height):
@@ -147,6 +174,8 @@ class Board:
     def get_square(self, x, y):
         return self.boardSquares[(x, y)]
 
+    def insert_piece(self, piece):
+        pass
+
 if __name__ == "__main__":
     new_board()
-    time.sleep(10)
