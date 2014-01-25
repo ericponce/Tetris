@@ -12,6 +12,18 @@ orange = (255, 125, 0)
 
 class Pieces:
 # rotate functions do not work
+    def check_dimensions(self):
+        height=0
+        width=0
+        for i in range(len(self.blockArray)):
+            if True in self.blockArray[i]:
+                height+=1
+        for i in range(len(self.blockArray)):
+            x=sum(self.blockArray[i])
+            if x>width:
+                width=x
+        self.height,self.width=height,width
+            
     def rotate_right(self):
         rotationArray=self.blockArray[:]
         for i in range(len(rotationArray)):
@@ -24,7 +36,7 @@ class Pieces:
                 a=y
                 b=-x
                 #stores 
-        self.blockArray[b+2][a+2]=rotationArray[i][j]
+                self.blockArray[b+2][a+2]=rotationArray[i][j]
         return self.blockArray
         
     def rotate_left(self):
@@ -39,25 +51,25 @@ class Pieces:
                 a=-y
                 b=x
                 #stores 
-        self.blockArray[b+2][a+2]=rotationArray[i][j]
+                self.blockArray[b+2][a+2]=rotationArray[i][j]
         return self.blockArray
-
-    def draw_piece(x,y):
-        pass
-
-    def fall():
-        pass
 
 class PieceI (Pieces):
     def __init__(self):
+        self.height=1
+        self.width=4
         self.color=cyan
         self.blockArray=[[False,False,False,False],
                          [True,True,True,True],
                          [False,False,False,False],
                          [False,False,False,False]]
+    
+            
 
 class PieceJ (Pieces):
     def __init__(self):
+        self.height=2
+        self.width=3
         self.color=blue
         self.blockArray=[[True,False,False],
                          [True,True,True],
@@ -65,6 +77,8 @@ class PieceJ (Pieces):
 
 class PieceL (Pieces):
     def __init__(self):
+        self.height=2
+        self.width=3
         self.color=orange
         self.blockArray=[[False,False,True],
                          [True,True,True],
@@ -72,6 +86,8 @@ class PieceL (Pieces):
 
 class PieceO (Pieces):
     def __init__(self):
+        self.width=2
+        self.height=2
         self.color=yellow
         self.blockArray=[[False,True,True,False],
                          [False,True,True,False],
@@ -79,6 +95,8 @@ class PieceO (Pieces):
 
 class PieceS (Pieces):
     def __init__(self):
+        self.height=2
+        self.width=3
         self.color=green
         self.blockArray=[[False,True,True],
                          [True,True,False],
@@ -87,12 +105,16 @@ class PieceS (Pieces):
 class PieceT (Pieces):
     def __init__(self):
         self.color=purple
+        self.height=2
+        self.width=3
         self.blockArray=[[False,True,False],
                          [True,True,True],
                          [False,False,False]]
 
 class PieceZ (Pieces):
     def __init__(self):
+        self.height=2
+        self.width=3
         self.color=red
         self.blockArray=[[True,True,False],
                          [False,True,True],

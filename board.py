@@ -107,7 +107,7 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed):
             #    s = board.get_square(key[1], key[0])
             #    i = list[key]
             #    s.set_color(colors[i])
-            piece_on_board=board.check_piece(row,col)
+            piece_on_board=board.check_piece(piece,row,col)
 
             stop,pause,row,col,piece=event_check(board,piece,row,col,stop,pause)
             board.squares.draw(screen)
@@ -248,14 +248,14 @@ class Board:
         col+=dx
         if col<=0:
             col=0
-        elif col>=7:
-            col=7
+        elif col>=self.width-piece.width:
+            col=self.width-piece.width
         self.insert_piece(piece,row,col)
         return row,col
 
     # Checks to see if piece has hit bottom of the board 
-    def check_piece(self, row, col):
-        if row==20:
+    def check_piece(self, piece, row, col):
+        if row==self.height-piece.height-1:
             return False
         else:
             return True
