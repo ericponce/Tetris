@@ -1,5 +1,6 @@
 import pygame, sys
 import random
+import pieces
 
 WIDTH = 25
 HEIGHT = 25
@@ -15,13 +16,13 @@ red = (255, 0, 0)
 blue = (0, 0, 255)
 orange = (255, 125, 0)
 
-colors = {  "cyan":cyan,
-            "yellow":yellow,
-            "purple":purple,
-            "green":green,
-            "red":red,
-            "blue":blue,
-            "orange":orange}
+colors = (  cyan,
+            yellow,
+            purple,
+            green,
+            red,
+            blue,
+            orange)
 
 def get_row_top_loc(rowNum, height = HEIGHT):
     return rowNum * height + 10
@@ -68,19 +69,14 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed):
     board.squares.draw(screen)
     draw_grid(screen, board.width, board.height)
     pygame.display.flip()
+    piece_on_board=False
+    piece=None
 
     reset = False
     while stop == False:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                stop = True
-                pygame.quit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_p:
-                    pause = 1 - pause
-                elif event.key == pygame.K_q:
-                    stop = True
         if stop == False and pause == False:
+            if piece:
+                stop,pause,row,col,piece=event_check(board,piece,row,col,stop,pause)
             board.squares.draw(screen)
             draw_grid(screen, board.width, board.height)
 
@@ -90,13 +86,30 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed):
             pygame.display.flip()
             clock.tick(10 * speed)
 
-            list = random_list(board.width, board.height)
-            for keys in list.keys():
-                s = board.get_square(keys[1], keys[0])
-                i = list[keys]
-                k = colors.keys()[i]
-                s.set_color(colors[k])
-                
+            if piece:
+                stop,pause,row,col,piece=event_check(board,piece,row,col,stop,pause)
+            #falling pieces
+            if piece_on_board:
+                row,col=board.move_piece(piece,row,col,0,1)
+                board.squares.draw(screen)
+                draw_grid(screen, board.width, board.height)
+
+            #Inserting piece into board
+            if not piece_on_board:
+                piece=board.retrieve_piece()
+                row,col=0,3
+                board.insert_piece(piece,row,col)
+                piece_on_board=True
+            
+            #Eric's cool display#
+            #list = random_list(board.width, board.height)
+            #for key in list:
+            #    s = board.get_square(key[1], key[0])
+            #    i = list[key]
+            #    s.set_color(colors[i])
+            piece_on_board=board.check_piece(row,col)
+
+            stop,pause,row,col,piece=event_check(board,piece,row,col,stop,pause)
             board.squares.draw(screen)
             draw_grid(screen, board.width, board.height)
             pygame.display.flip()
@@ -106,22 +119,46 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed):
         new_game()
     pygame.quit()
 
+#made it a separate time so events can be checked more than once for fall
+def event_check(board,piece,row,col,stop,pause):
+    for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                stop = True
+                pygame.quit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    pause = 1 - pause
+                elif event.key == pygame.K_q:
+                    stop = True
+                elif event.key == pygame.K_RIGHT:
+                    row,col=board.move_piece(piece,row,col,1,0)
+                elif event.key == pygame.K_LEFT:
+                    row,col=board.move_piece(piece,row,col,-1,0)
+                elif event.key == pygame.K_a:
+                    board.clear_piece(piece,row,col)
+                    piece.blockArray=piece.rotate_left()
+                    board.insert_piece(piece,row,col)
+                elif event.key == pygame.K_d:
+                    board.clear_piece(piece,row,col)
+                    piece.blockArray=piece.rotate_right()
+                    board.insert_piece(piece,row,col)
+    return stop, pause, row, col, piece
+
 def random_list(width, height):
     list = {}
     for i in range(10):
         c = random.randint(0, width - 1)
         r = random.randint(0, height - 1)
-        i = random.randint(0, len(colors.values()) - 1)
+        i = random.randint(0, len(colors) - 1)
         list[(c, r)] = i
     return list
 
 class PieceBag:
-    def __init(self):
-        refill_bag()
+    def __init__(self):
+        self.bag=[]
+        self.refill_bag()
 
     def refill_bag(self):
-        self.bag = []
-
         for x in range(7):
             self.bag.append(random.randint(0, 6))
 
@@ -130,10 +167,10 @@ class PieceBag:
 
     def get_next_piece(self):
         self.remaining -= 1;
-        return bag.pop()
+        return self.bag.pop(0)
 
     def remaining_pieces(self):
-        return remaining
+        return self.remaining
 
 
 class Square(pygame.sprite.Sprite):
@@ -161,6 +198,7 @@ class Board:
     def __init__(self, width, height):
         self.width = width
         self.height = height
+        self.pieceBag=PieceBag()
 
         self.squares = pygame.sprite.RenderPlain()
         self.boardSquares = {}
@@ -171,11 +209,56 @@ class Board:
                 self.boardSquares[(j, i)] = s
                 self.squares.add(s)
 
+    def retrieve_piece(self):
+        piece=pieces.get_piece(self.pieceBag.get_next_piece())
+        return piece
+
     def get_square(self, x, y):
         return self.boardSquares[(x, y)]
 
-    def insert_piece(self, piece):
-        pass
+    def insert_piece(self, piece, row, col):
+        j=row
+        for row_position in piece.blockArray:
+            i=col
+            for col_position in row_position:
+                if col_position==True:
+                    s=self.boardSquares[(j,i)]
+                    s.set_color(piece.color)
+                else:
+                    pass
+                i+=1
+            j+=1
+
+    def clear_piece(self,piece,row,col):
+        j=row
+        for row_position in piece.blockArray:
+            i=col
+            for col_position in row_position:
+                if col_position==True:
+                    s=self.boardSquares[(j,i)]
+                    s.set_color(gray)
+                else:
+                    pass
+                i+=1
+            j+=1
+
+    def move_piece(self, piece, row, col, dx, dy):
+        self.clear_piece(piece,row,col)
+        row+=dy
+        col+=dx
+        if col<=0:
+            col=0
+        elif col>=7:
+            col=7
+        self.insert_piece(piece,row,col)
+        return row,col
+
+    # Checks to see if piece has hit bottom of the board 
+    def check_piece(self, row, col):
+        if row==20:
+            return False
+        else:
+            return True
 
 if __name__ == "__main__":
     new_board()

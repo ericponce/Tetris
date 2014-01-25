@@ -11,8 +11,8 @@ blue = (0, 0, 255)
 orange = (255, 125, 0)
 
 class Pieces:
-
-    def rotate_right():
+# rotate functions do not work
+    def rotate_right(self):
         rotationArray=self.blockArray[:]
         for i in range(len(rotationArray)):
             #turns rows 1 to 3 into coordinates -1 to 1
@@ -24,9 +24,10 @@ class Pieces:
                 a=y
                 b=-x
                 #stores 
-                self.blockArray[b+2][a+2]=rotationArray[i][j]
+        self.blockArray[b+2][a+2]=rotationArray[i][j]
+        return self.blockArray
         
-    def rotate_left():
+    def rotate_left(self):
         rotationArray=self.blockArray[:]
         for i in range(len(rotationArray)):
             #turns rows 1 to 3 into coordinates -1 to 1
@@ -38,10 +39,11 @@ class Pieces:
                 a=-y
                 b=x
                 #stores 
-                self.blockArray[b+2][a+2]=rotationArray[i][j]
+        self.blockArray[b+2][a+2]=rotationArray[i][j]
+        return self.blockArray
 
     def draw_piece(x,y):
-        
+        pass
 
     def fall():
         pass
@@ -95,4 +97,11 @@ class PieceZ (Pieces):
         self.blockArray=[[True,True,False],
                          [False,True,True],
                          [False,False,False]]
-   
+
+#Pieces put into tuple to be called by index number   
+I,J,L,O,S,T,Z=PieceI(),PieceJ(),PieceL(),PieceO(),PieceS(),PieceT(),PieceZ()
+PIECES=(I,J,L,O,S,T,Z)
+
+def get_piece(index):
+    piece=PIECES[index]
+    return piece
