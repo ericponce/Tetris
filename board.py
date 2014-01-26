@@ -135,12 +135,13 @@ def event_check(board,piece,row,col,stop,pause):
                 elif event.key == pygame.K_LEFT:
                     row,col=board.move_piece(piece,row,col,-1,0)
                 elif event.key == pygame.K_a:
-                    board.clear_piece(piece,row,col)
+                    """board.clear_piece(piece,row,col)
                     piece.blockArray=piece.rotate_left()
-                    board.insert_piece(piece,row,col)
+                    board.insert_piece(piece,row,col)"""
+                    pass
                 elif event.key == pygame.K_d:
                     board.clear_piece(piece,row,col)
-                    piece.blockArray=piece.rotate_right()
+                    piece.blockArray=piece.rotate()
                     board.insert_piece(piece,row,col)
     return stop, pause, row, col, piece
 
@@ -167,7 +168,8 @@ class PieceBag:
 
     def get_next_piece(self):
         self.remaining -= 1;
-        return self.bag.pop(0)
+        nextPiece=self.bag.pop(0)
+        return nextPiece
 
     def remaining_pieces(self):
         return self.remaining

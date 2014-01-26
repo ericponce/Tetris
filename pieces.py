@@ -11,7 +11,6 @@ blue = (0, 0, 255)
 orange = (255, 125, 0)
 
 class Pieces:
-# rotate functions do not work
     def check_dimensions(self):
         height=0
         width=0
@@ -24,35 +23,15 @@ class Pieces:
                 width=x
         self.height,self.width=height,width
             
-    def rotate_right(self):
-        rotationArray=self.blockArray[:]
-        for i in range(len(rotationArray)):
-            #turns rows 1 to 3 into coordinates -1 to 1
-            y=i-2
-            for j in range(len(rotationArray[i])):
-                #turns cols 1 to 3 into coordinates -1 to 1
-                x=j-2
-                #rotates the point (x,y) to new point (a,b)
-                a=y
-                b=-x
-                #stores 
-                self.blockArray[b+2][a+2]=rotationArray[i][j]
-        return self.blockArray
+    def rotate(self):
+        rotationArray=[]
+        for i in range(len(self.blockArray)):
+            rotationArray.append([])
+        for i in range(len(self.blockArray)):
+            for j in range(len(self.blockArray[i])):
+                rotationArray[i].append(self.blockArray[len(self.blockArray)-1-j][i])
+        return rotationArray
         
-    def rotate_left(self):
-        rotationArray=self.blockArray[:]
-        for i in range(len(rotationArray)):
-            #turns rows 1 to 3 into coordinates -1 to 1
-            y=i-2
-            for j in range(len(rotationArray[i])):
-                #turns cols 1 to 3 into coordinates -1 to 1
-                x=j-2
-                #rotates the point (x,y) to new point (a,b)
-                a=-y
-                b=x
-                #stores 
-                self.blockArray[b+2][a+2]=rotationArray[i][j]
-        return self.blockArray
 
 class PieceI (Pieces):
     def __init__(self):
@@ -93,6 +72,9 @@ class PieceO (Pieces):
                          [False,True,True,False],
                          [False,False,False,False]]
 
+    def rotate(self):
+        return self.blockArray
+
 class PieceS (Pieces):
     def __init__(self):
         self.height=2
@@ -120,10 +102,14 @@ class PieceZ (Pieces):
                          [False,True,True],
                          [False,False,False]]
 
-#Pieces put into tuple to be called by index number   
-I,J,L,O,S,T,Z=PieceI(),PieceJ(),PieceL(),PieceO(),PieceS(),PieceT(),PieceZ()
-PIECES=(I,J,L,O,S,T,Z)
+#Pieces put into tuple to be called by index number
+PIECES=(PieceI(),PieceJ(),PieceL(),PieceO(),PieceS(),PieceT(),PieceZ())
 
 def get_piece(index):
     piece=PIECES[index]
     return piece
+
+J=PieceJ()
+print J.blockArray
+J.blockArray=J.rotate()
+print J.blockArray
