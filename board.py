@@ -70,12 +70,11 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed):
     draw_grid(screen, board.width, board.height)
     pygame.display.flip()
     piece_on_board=False
-    piece=None
 
     reset = False
     while stop == False:
         if stop == False and pause == False:
-            if piece:
+            if piece_on_board:
                 stop,pause,row,col,piece=event_check(board,piece,row,col,stop,pause)
             board.squares.draw(screen)
             draw_grid(screen, board.width, board.height)
@@ -86,7 +85,7 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed):
             pygame.display.flip()
             clock.tick(10 * speed)
 
-            if piece:
+            if piece_on_board:
                 stop,pause,row,col,piece=event_check(board,piece,row,col,stop,pause)
             #falling pieces
             if piece_on_board:
@@ -96,6 +95,8 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed):
 
             #Inserting piece into board
             if not piece_on_board:
+                if len(board.pieceBag.bag)==0:
+                    board.pieceBag.refill_bag()
                 piece=board.retrieve_piece()
                 row,col=0,3
                 board.insert_piece(piece,row,col)
@@ -139,9 +140,10 @@ def event_check(board,piece,row,col,stop,pause):
                     piece.blockArray=piece.rotate_left()
                     board.insert_piece(piece,row,col)"""
                     pass
-                elif event.key == pygame.K_d:
+                elif event.key == pygame.K_UP:
                     board.clear_piece(piece,row,col)
                     piece.blockArray=piece.rotate()
+                    piece.update_dimensions()
                     board.insert_piece(piece,row,col)
     return stop, pause, row, col, piece
 
@@ -253,11 +255,12 @@ class Board:
         elif col>=self.width-piece.width:
             col=self.width-piece.width
         self.insert_piece(piece,row,col)
+        print row,col
         return row,col
 
     # Checks to see if piece has hit bottom of the board 
     def check_piece(self, piece, row, col):
-        if row==self.height-piece.height-1:
+        if row==self.height-piece.height:
             return False
         else:
             return True

@@ -11,7 +11,7 @@ blue = (0, 0, 255)
 orange = (255, 125, 0)
 
 class Pieces:
-    def check_dimensions(self):
+    def update_dimensions(self):
         height=0
         width=0
         for i in range(len(self.blockArray)):
@@ -109,7 +109,3 @@ def get_piece(index):
     piece=PIECES[index]
     return piece
 
-J=PieceJ()
-print J.blockArray
-J.blockArray=J.rotate()
-print J.blockArray
