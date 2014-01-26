@@ -143,7 +143,7 @@ def event_check(board,piece,row,col,stop,pause):
                 elif event.key == pygame.K_UP:
                     board.clear_piece(piece,row,col)
                     piece.blockArray=piece.rotate()
-                    piece.update_dimensions()
+                    #piece.update_dimensions()
                     board.insert_piece(piece,row,col)
     return stop, pause, row, col, piece
 
@@ -210,53 +210,39 @@ class Board:
         for i in range(width):
             for j in range(height):
                 s = Square(j, i, gray)
-                self.boardSquares[(j, i)] = s
+                self.boardSquares[(i, j)] = s
                 self.squares.add(s)
 
     def retrieve_piece(self):
-        piece=pieces.get_piece(self.pieceBag.get_next_piece())
-        return piece
+        if not self.pieceBag.remaining:
+            self.pieceBag.refill_bag()
+        return pieces.get_piece(self.pieceBag.get_next_piece())
 
     def get_square(self, x, y):
         return self.boardSquares[(x, y)]
 
     def insert_piece(self, piece, row, col):
-        j=row
-        for row_position in piece.blockArray:
-            i=col
-            for col_position in row_position:
-                if col_position==True:
-                    s=self.boardSquares[(j,i)]
-                    s.set_color(piece.color)
-                else:
-                    pass
-                i+=1
-            j+=1
+        for i in range(len(piece.blockArray)):
+            for j in range(len(piece.blockArray[0])):
+                if piece.blockArray[j][i]:
+                    self.boardSquares[(j + col, i + row)].set_color(piece.color)
 
-    def clear_piece(self,piece,row,col):
-        j=row
-        for row_position in piece.blockArray:
-            i=col
-            for col_position in row_position:
-                if col_position==True:
-                    s=self.boardSquares[(j,i)]
-                    s.set_color(gray)
-                else:
-                    pass
-                i+=1
-            j+=1
+    def clear_piece(self, piece, row, col):
+        for i in range(len(piece.blockArray)):
+            for j in range(len(piece.blockArray[0])):
+                if piece.blockArray[j][i]:
+                    self.boardSquares[(j + col, i + row)].set_color(gray)
 
     def move_piece(self, piece, row, col, dx, dy):
         self.clear_piece(piece,row,col)
-        row+=dy
-        col+=dx
-        if col<=0:
-            col=0
-        elif col>=self.width-piece.width:
-            col=self.width-piece.width
-        self.insert_piece(piece,row,col)
-        print row,col
-        return row,col
+        row += dy
+        col += dx
+        if col <= 0:
+            col = 0
+        elif col >= self.width - piece.width:
+            col = self.width - piece.width
+        self.insert_piece(piece, row, col)
+        return row, col
 
     # Checks to see if piece has hit bottom of the board 
     def check_piece(self, piece, row, col):

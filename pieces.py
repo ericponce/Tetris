@@ -30,6 +30,7 @@ class Pieces:
         for i in range(len(self.blockArray)):
             for j in range(len(self.blockArray[i])):
                 rotationArray[i].append(self.blockArray[len(self.blockArray)-1-j][i])
+        self.height, self.width = self.width, self.height
         return rotationArray
         
 
@@ -103,9 +104,9 @@ class PieceZ (Pieces):
                          [False,False,False]]
 
 #Pieces put into tuple to be called by index number
-PIECES=(PieceI(),PieceJ(),PieceL(),PieceO(),PieceS(),PieceT(),PieceZ())
+PIECES = ('PieceJ', 'PieceI', 'PieceL', 'PieceO', 'PieceS', 'PieceT', 'PieceZ')
 
 def get_piece(index):
-    piece=PIECES[index]
+    piece=eval(PIECES[index])()
     return piece
 
