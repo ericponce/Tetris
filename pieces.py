@@ -11,18 +11,6 @@ blue = (0, 0, 255)
 orange = (255, 125, 0)
 
 class Pieces:
-    def update_dimensions(self):
-        height=0
-        width=0
-        for i in range(len(self.blockArray)):
-            if True in self.blockArray[i]:
-                height+=1
-        for i in range(len(self.blockArray)):
-            x=sum(self.blockArray[i])
-            if x>width:
-                width=x
-        self.height,self.width=height,width
-            
     def rotate(self):
         rotationArray=[]
         for i in range(len(self.blockArray)):

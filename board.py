@@ -1,6 +1,6 @@
 import pygame, sys
 import random
-import pieces
+import pieces, BoardModel
 
 WIDTH = 25
 HEIGHT = 25
@@ -143,7 +143,6 @@ def event_check(board,piece,row,col,stop,pause):
                 elif event.key == pygame.K_UP:
                     board.clear_piece(piece,row,col)
                     piece.blockArray=piece.rotate()
-                    #piece.update_dimensions()
                     board.insert_piece(piece,row,col)
     return stop, pause, row, col, piece
 
@@ -221,28 +220,7 @@ class Board:
     def get_square(self, x, y):
         return self.boardSquares[(x, y)]
 
-    def insert_piece(self, piece, row, col):
-        for i in range(len(piece.blockArray)):
-            for j in range(len(piece.blockArray[0])):
-                if piece.blockArray[j][i]:
-                    self.boardSquares[(j + col, i + row)].set_color(piece.color)
-
-    def clear_piece(self, piece, row, col):
-        for i in range(len(piece.blockArray)):
-            for j in range(len(piece.blockArray[0])):
-                if piece.blockArray[j][i]:
-                    self.boardSquares[(j + col, i + row)].set_color(gray)
-
-    def move_piece(self, piece, row, col, dx, dy):
-        self.clear_piece(piece,row,col)
-        row += dy
-        col += dx
-        if col <= 0:
-            col = 0
-        elif col >= self.width - piece.width:
-            col = self.width - piece.width
-        self.insert_piece(piece, row, col)
-        return row, col
+    
 
     # Checks to see if piece has hit bottom of the board 
     def check_piece(self, piece, row, col):
@@ -250,6 +228,9 @@ class Board:
             return False
         else:
             return True
+
+    def check_collide(self, piece, row, col):
+        
 
 if __name__ == "__main__":
     new_board()
