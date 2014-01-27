@@ -69,13 +69,20 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed):
     board.squares.draw(screen)
     draw_grid(screen, board.width, board.height)
     pygame.display.flip()
-    piece_on_board=False
+    board.boardModel.new_piece()
 
     reset = False
     while stop == False:
         if stop == False and pause == False:
-            if piece_on_board:
-                stop,pause,row,col,piece=event_check(board,piece,row,col,stop,pause)
+
+
+            if not board.boardModel.activePiece:
+                board.boardModel.new_piece()
+
+            stop,pause = event_check(board, stop, pause)
+
+            board.boardModel.act_on_piece(0, 1)
+
             board.squares.draw(screen)
             draw_grid(screen, board.width, board.height)
 
@@ -85,43 +92,12 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed):
             pygame.display.flip()
             clock.tick(10 * speed)
 
-            if piece_on_board:
-                stop,pause,row,col,piece=event_check(board,piece,row,col,stop,pause)
-            #falling pieces
-            if piece_on_board:
-                row,col=board.move_piece(piece,row,col,0,1)
-                board.squares.draw(screen)
-                draw_grid(screen, board.width, board.height)
-
-            #Inserting piece into board
-            if not piece_on_board:
-                if len(board.pieceBag.bag)==0:
-                    board.pieceBag.refill_bag()
-                piece=board.retrieve_piece()
-                row,col=0,3
-                board.insert_piece(piece,row,col)
-                piece_on_board=True
-            
-            #Eric's cool display#
-            #list = random_list(board.width, board.height)
-            #for key in list:
-            #    s = board.get_square(key[1], key[0])
-            #    i = list[key]
-            #    s.set_color(colors[i])
-            piece_on_board=board.check_piece(piece,row,col)
-
-            stop,pause,row,col,piece=event_check(board,piece,row,col,stop,pause)
-            board.squares.draw(screen)
-            draw_grid(screen, board.width, board.height)
-            pygame.display.flip()
-            clock.tick(5 * speed)
-
     if reset:
         new_game()
     pygame.quit()
 
 #made it a separate time so events can be checked more than once for fall
-def event_check(board,piece,row,col,stop,pause):
+def event_check(board, stop, pause):
     for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 stop = True
@@ -129,22 +105,15 @@ def event_check(board,piece,row,col,stop,pause):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
                     pause = 1 - pause
-                elif event.key == pygame.K_q:
+                if event.key == pygame.K_q:
                     stop = True
-                elif event.key == pygame.K_RIGHT:
-                    row,col=board.move_piece(piece,row,col,1,0)
+                if event.key == pygame.K_UP:
+                    board.boardModel.rotate_piece()
+                if event.key == pygame.K_RIGHT:
+                    board.boardModel.act_on_piece(1, 0)
                 elif event.key == pygame.K_LEFT:
-                    row,col=board.move_piece(piece,row,col,-1,0)
-                elif event.key == pygame.K_a:
-                    """board.clear_piece(piece,row,col)
-                    piece.blockArray=piece.rotate_left()
-                    board.insert_piece(piece,row,col)"""
-                    pass
-                elif event.key == pygame.K_UP:
-                    board.clear_piece(piece,row,col)
-                    piece.blockArray=piece.rotate()
-                    board.insert_piece(piece,row,col)
-    return stop, pause, row, col, piece
+                    board.boardModel.act_on_piece(-1, 0)
+    return stop, pause
 
 def random_list(width, height):
     list = {}
@@ -155,27 +124,6 @@ def random_list(width, height):
         list[(c, r)] = i
     return list
 
-class PieceBag:
-    def __init__(self):
-        self.bag=[]
-        self.refill_bag()
-
-    def refill_bag(self):
-        for x in range(7):
-            self.bag.append(random.randint(0, 6))
-
-        self.remaining = 7
-        pass
-
-    def get_next_piece(self):
-        self.remaining -= 1;
-        nextPiece=self.bag.pop(0)
-        return nextPiece
-
-    def remaining_pieces(self):
-        return self.remaining
-
-
 class Square(pygame.sprite.Sprite):
     def __init__(self, row, col, color):
         pygame.sprite.Sprite.__init__(self)
@@ -183,6 +131,7 @@ class Square(pygame.sprite.Sprite):
         self.col = col
         self.image = pygame.Surface([WIDTH, HEIGHT])
         self.image.fill(color)
+        self.color = color
         self.rect = self.image.get_rect()
 
         self.rect.x = get_col_left_loc(col)
@@ -201,36 +150,32 @@ class Board:
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.pieceBag=PieceBag()
+        self.boardModel = BoardModel.BoardModel(width, height)
 
         self.squares = pygame.sprite.RenderPlain()
-        self.boardSquares = {}
 
         for i in range(width):
             for j in range(height):
-                s = Square(j, i, gray)
-                self.boardSquares[(i, j)] = s
-                self.squares.add(s)
-
-    def retrieve_piece(self):
-        if not self.pieceBag.remaining:
-            self.pieceBag.refill_bag()
-        return pieces.get_piece(self.pieceBag.get_next_piece())
+                self.squares.add(self.boardModel.get_square(i, j))
 
     def get_square(self, x, y):
-        return self.boardSquares[(x, y)]
+        return self.boardModel.get_square(x, y)
 
-    
+    def update_sprites(self):
+        self.squares = pygame.sprite.RenderPlain()
 
-    # Checks to see if piece has hit bottom of the board 
-    def check_piece(self, piece, row, col):
-        if row==self.height-piece.height:
-            return False
-        else:
-            return True
+        for i in range(width):
+            for j in range(height):
+                self.squares.add(self.boardModel.get_square(i, j))
 
-    def check_collide(self, piece, row, col):
+
+
         
 
 if __name__ == "__main__":
     new_board()
+
+
+
+
+

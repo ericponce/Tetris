@@ -24,7 +24,7 @@ class Pieces:
 
 class PieceI (Pieces):
     def __init__(self):
-        self.height=1
+        self.height=4
         self.width=4
         self.color=cyan
         self.blockArray=[[False,False,False,False],
@@ -36,7 +36,7 @@ class PieceI (Pieces):
 
 class PieceJ (Pieces):
     def __init__(self):
-        self.height=2
+        self.height=3
         self.width=3
         self.color=blue
         self.blockArray=[[True,False,False],
@@ -45,7 +45,7 @@ class PieceJ (Pieces):
 
 class PieceL (Pieces):
     def __init__(self):
-        self.height=2
+        self.height=3
         self.width=3
         self.color=orange
         self.blockArray=[[False,False,True],
@@ -54,8 +54,8 @@ class PieceL (Pieces):
 
 class PieceO (Pieces):
     def __init__(self):
-        self.width=2
-        self.height=2
+        self.width=4
+        self.height=3
         self.color=yellow
         self.blockArray=[[False,True,True,False],
                          [False,True,True,False],
@@ -66,7 +66,7 @@ class PieceO (Pieces):
 
 class PieceS (Pieces):
     def __init__(self):
-        self.height=2
+        self.height=3
         self.width=3
         self.color=green
         self.blockArray=[[False,True,True],
@@ -76,7 +76,7 @@ class PieceS (Pieces):
 class PieceT (Pieces):
     def __init__(self):
         self.color=purple
-        self.height=2
+        self.height=3
         self.width=3
         self.blockArray=[[False,True,False],
                          [True,True,True],
@@ -84,7 +84,7 @@ class PieceT (Pieces):
 
 class PieceZ (Pieces):
     def __init__(self):
-        self.height=2
+        self.height=3
         self.width=3
         self.color=red
         self.blockArray=[[True,True,False],
