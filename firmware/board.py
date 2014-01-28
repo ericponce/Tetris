@@ -30,7 +30,7 @@ def get_row_top_loc(rowNum, height = HEIGHT):
 def get_col_left_loc(colNum, width = WIDTH):
     return colNum * width + 10
 
-def update_text(screen, message, width = 10, messageNum = 1):
+def update_line(screen, message, width = 10, messageNum = 1):
     textSize = 20
     font = pygame.font.Font(None, 20)
     textY = 0 + textSize * messageNum
@@ -40,7 +40,11 @@ def update_text(screen, message, width = 10, messageNum = 1):
     textRect.centery = textY
     screen.blit(text, textRect)
 
-def new_board(width = 10, height = 22, speed = 1):
+def update_text(screen, messages, width = 10):
+    for i in range(len(messages)):
+        update_line(screen, messages[i], width, i + 1)
+
+def new_board(width = 10, height = 22, speed = 0.5):
     pygame.init()
 
     window_size = [width * WIDTH + 200, height * HEIGHT + 20]
@@ -85,8 +89,7 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed):
             board.squares.draw(screen)
             draw_grid(screen, board.width, board.height)
 
-            update_text(screen, " Tetris ", board.width, 1)
-            update_text(screen, " Press q to quit", board.width, 2)
+            update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit"], board.width)
 
             pygame.display.flip()
             clock.tick(10 * speed)
@@ -167,8 +170,6 @@ class Board:
         for i in range(width):
             for j in range(height):
                 self.squares.add(self.boardModel.get_square(i, j))
-
-
 
         
 

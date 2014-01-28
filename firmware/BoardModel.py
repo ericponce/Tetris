@@ -42,6 +42,8 @@ class BoardModel:
             for j in range(width):
                 self.boardSquares[i].append(board.Square(i, j, gray))
 
+        print self.boardSquares
+
         self.activePiece = False
         self.currentPiece = None
         self.pieceRow = 0
@@ -59,7 +61,7 @@ class BoardModel:
         self.pieceRow = 0
 
     def rotate_piece(self):
-        self.clear_piece() #Try a different way to this
+        self.clear_piece() #Try a different way to do this
         self.currentPiece.blockArray = self.currentPiece.rotate()
         self.draw_piece()
 
@@ -68,7 +70,8 @@ class BoardModel:
             for j in range(self.currentPiece.width):
                 if self.currentPiece.blockArray[i][j]:
                     if i + dy < self.currentPiece.height and j + dx < self.currentPiece.width and i + dy > -1 and j + dx > -1 and not self.currentPiece.blockArray[i + dy][j + dx]:
-                        if j + self.pieceCol + dx < -1 and j + self.pieceCol + dx > self.width - 1:
+                        print "i: " + str(i) + " j: " + str(j) + " dx: " + str(dx) + " dy: " + str(dy)
+                        if j + self.pieceCol + dx < 0 and j + self.pieceCol + dx > self.width - 1:
                             return True, self.CollisionTypeEnum.wall
                         elif i + self.pieceRow + dy > self.height - 1:
                             return True, self.CollisionTypeEnum.floor
