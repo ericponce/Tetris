@@ -59,21 +59,24 @@ class BoardModel:
         self.pieceRow = 0
 
     def rotate_piece(self):
+        self.clear_piece() #Try a different way to this
         self.currentPiece.blockArray = self.currentPiece.rotate()
+        self.draw_piece()
 
     """
     Private method, returns if will collide and type of collision
     """
     def _will_collide(self, dx, dy):
-        for i in range(self.currentPiece.height - 1):
-            for j in range(self.currentPiece.width - 1):
-                if self.currentPiece.blockArray[j][i]:
-                    if not j + self.pieceCol + dx > -1 and j + self.pieceCol + dx < self.width:
-                        return True, self.CollisionTypeEnum.wall
-                    elif not i + self.pieceRow + dy > -1:
-                        return True, self.CollisionTypeEnum.floor
-                    elif not self.boardSquares[i + self.pieceRow + dy][j + self.pieceCol + dx].color == gray:
-                        return True, self.CollisionTypeEnum.piece
+        for i in range(self.currentPiece.height):
+            for j in range(self.currentPiece.width):
+                if self.currentPiece.blockArray[i][j]:
+                    if i + dy < self.currentPiece.height and j + dx < self.currentPiece.width and i + dy > -1 and j + dx > -1 and not self.currentPiece.blockArray[i + dy][j + dx]:
+                        if j + self.pieceCol + dx < -1 and j + self.pieceCol + dx > self.width - 1:
+                            return True, self.CollisionTypeEnum.wall
+                        elif i + self.pieceRow + dy > self.height - 1:
+                            return True, self.CollisionTypeEnum.floor
+                        elif self.boardSquares[i + self.pieceRow + dy][j + self.pieceCol + dx].color != gray:
+                            return True, self.CollisionTypeEnum.piece
         return False, None
 
     def act_on_piece(self, dx, dy):
@@ -89,13 +92,17 @@ class BoardModel:
 
 
     def draw_piece(self):
-        for i in range(self.currentPiece.height - 1):
-            for j in range(self.currentPiece.width - 1):
-                if self.currentPiece.blockArray[j][i]:
+        for i in range(self.currentPiece.height):
+            for j in range(self.currentPiece.width):
+                if self.currentPiece.blockArray[i][j]:
+                    print "X: " + str(j + self.pieceCol) + " Y: " + str(i + self.pieceRow)
                     self.boardSquares[i + self.pieceRow][j + self.pieceCol].set_color(self.currentPiece.color)
 
     def clear_piece(self):
-        for i in range(self.currentPiece.height - 1):
-            for j in range(self.currentPiece.width - 1):
-                if self.currentPiece.blockArray[j][i]:
+        for i in range(self.currentPiece.height):
+            for j in range(self.currentPiece.width):
+                if self.currentPiece.blockArray[i][j]:
                     self.boardSquares[i + self.pieceRow][j + self.pieceCol].set_color(gray)
+
+
+

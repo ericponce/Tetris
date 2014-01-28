@@ -24,10 +24,10 @@ class Pieces:
 
 class PieceI (Pieces):
     def __init__(self):
-        self.height=4
-        self.width=4
-        self.color=cyan
-        self.blockArray=[[False,False,False,False],
+        self.height = 4
+        self.width = 4
+        self.color = cyan
+        self.blockArray = [[False,False,False,False],
                          [True,True,True,True],
                          [False,False,False,False],
                          [False,False,False,False]]
