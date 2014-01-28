@@ -63,9 +63,6 @@ class BoardModel:
         self.currentPiece.blockArray = self.currentPiece.rotate()
         self.draw_piece()
 
-    """
-    Private method, returns if will collide and type of collision
-    """
     def _will_collide(self, dx, dy):
         for i in range(self.currentPiece.height):
             for j in range(self.currentPiece.width):
@@ -80,23 +77,26 @@ class BoardModel:
         return False, None
 
     def act_on_piece(self, dx, dy):
-        willCollide, collisionType = self._will_collide(dx, dy)
-        if willCollide:
-            if collisionType != self.CollisionTypeEnum.wall:
-                activePiece = False
-        else:
-            self.clear_piece()
-            self.pieceRow += dy
-            self.pieceCol += dx
-            self.draw_piece()
+        if self.activePiece:
+            willCollide, collisionType = self._will_collide(dx, dy)
+            if willCollide:
+                if collisionType != self.CollisionTypeEnum.wall:
+                    self.activePiece = False
+            else:
+                self.clear_piece()
+                self.pieceRow += dy
+                self.pieceCol += dx
+                self.draw_piece()
 
 
     def draw_piece(self):
         for i in range(self.currentPiece.height):
             for j in range(self.currentPiece.width):
                 if self.currentPiece.blockArray[i][j]:
-                    print "X: " + str(j + self.pieceCol) + " Y: " + str(i + self.pieceRow)
-                    self.boardSquares[i + self.pieceRow][j + self.pieceCol].set_color(self.currentPiece.color)
+                    try:
+                        self.boardSquares[i + self.pieceRow][j + self.pieceCol].set_color(self.currentPiece.color)
+                    except IndexError:
+                        print "X: " + str(j + self.pieceCol) + " Y: " + str(i + self.pieceRow)
 
     def clear_piece(self):
         for i in range(self.currentPiece.height):

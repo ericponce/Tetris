@@ -69,14 +69,13 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed):
     board.squares.draw(screen)
     draw_grid(screen, board.width, board.height)
     pygame.display.flip()
-    board.boardModel.new_piece()
 
     reset = False
     while stop == False:
         if stop == False and pause == False:
 
-
             if not board.boardModel.activePiece:
+                print "Getting new piece"
                 board.boardModel.new_piece()
 
             stop,pause = event_check(board, stop, pause)
