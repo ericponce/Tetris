@@ -1,5 +1,0 @@
-Things to do:
-	logic
-	board 
-		stuff
-	pieces
