@@ -62,9 +62,12 @@ class BoardModel:
         self.pieceRow = 0
 
     def rotate_piece(self):
-        self.clear_piece() #Try a different way to do this
-        self.currentPiece.blockArray = self.currentPiece.rotate()
-        self.draw_piece()
+        if self._will_collide(0,0):
+            self.clear_piece() #Try a different way to do this
+            self.currentPiece.blockArray = self.currentPiece.rotate()
+            self.draw_piece()
+        else:
+            pass
 
     def _will_collide(self, dx, dy):
         for i in range(self.currentPiece.height):
@@ -103,6 +106,8 @@ class BoardModel:
             if willCollide:
                 if collisionType != self.CollisionTypeEnum.wall:
                     self.activePiece = False
+                    lines=self.check_lines()
+                    self.drop_lines(lines)
             else:
                 self.clear_piece()
                 self.pieceRow += dy
@@ -125,5 +130,40 @@ class BoardModel:
                 if self.currentPiece.blockArray[i][j]:
                     self.boardSquares[i + self.pieceRow][j + self.pieceCol].set_color(gray)
 
+    def check_lines(self):
+        lines = []
+        for i in range(self.height-1,0,-1):
+            line = [i]
+            colors = []
+            for j in range(self.width):
+                line.append(self.boardSquares[i][j])
+                colors.append(self.boardSquares[i][j].color)
+            if gray not in colors:
+                lines.append(line)
+            else:
+                pass
+            
+        return lines
+
+    def clear_line(self,line):
+        for square in line[1:]:
+            square.set_color(gray)
+
+    def drop_lines(self,lines):
+        for line in lines:
+            self.clear_line(line)
+            Row = line.pop(0) - 1
+            if Row >= self.height - 1:
+                pass
+            else:
+                for i in range(Row,0,-1):
+                    for j in range(self.width):
+                        self.boardSquares[i+1][j].set_color(self.boardSquares[i][j].color)
+                        self.boardSquares[i][j].set_color(gray)
+                    
+            
+            
+            
+                
 
 
