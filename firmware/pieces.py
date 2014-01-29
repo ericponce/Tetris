@@ -13,11 +13,11 @@ orange = (255, 125, 0)
 class Pieces:
     def rotate(self):
         rotationArray=[]
-        for i in range(len(self.blockArray)):
+        n=len(self.blockArray);
+        for i in range(n):
             rotationArray.append([])
-        for i in range(len(self.blockArray)):
-            for j in range(len(self.blockArray[i])):
-                rotationArray[i].append(self.blockArray[len(self.blockArray)-1-j][i])
+            for j in range(n):
+                rotationArray[i].append(self.blockArray[n - 1 - j][i])
         self.height, self.width = self.width, self.height
         return rotationArray
         

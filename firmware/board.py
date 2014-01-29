@@ -110,9 +110,9 @@ def event_check(board, stop, pause):
                 elif event.key == pygame.K_q:
                     stop = True
                     pygame.quit()
-                if event.key == pygame.K_UP:
+                elif event.key == pygame.K_UP:
                     board.boardModel.rotate_piece()
-                if event.key == pygame.K_RIGHT:
+                elif event.key == pygame.K_RIGHT:
                     board.boardModel.act_on_piece(1, 0)
                 elif event.key == pygame.K_LEFT:
                     board.boardModel.act_on_piece(-1, 0)

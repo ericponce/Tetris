@@ -27,8 +27,9 @@ class BoardModel:
 
     class CollisionTypeEnum:
         wall = 0
+        pieceSide = 0
         floor = 1
-        piece = 2
+        pieceBelow = 2
 
     def __init__(self, width, height):
         self.width = width
@@ -69,14 +70,27 @@ class BoardModel:
         for i in range(self.currentPiece.height):
             for j in range(self.currentPiece.width):
                 if self.currentPiece.blockArray[i][j]:
-                    if i + dy < self.currentPiece.height and j + dx < self.currentPiece.width and i + dy > -1 and j + dx > -1 and not self.currentPiece.blockArray[i + dy][j + dx]:
+                    if i + dy < self.currentPiece.height and i + dy > -1 and j + dx < self.currentPiece.width and j + dx > -1 and not self.currentPiece.blockArray[i + dy][j + dx]:
                         print "i: " + str(i) + " j: " + str(j) + " dx: " + str(dx) + " dy: " + str(dy)
-                        if j + self.pieceCol + dx < 0 and j + self.pieceCol + dx > self.width - 1:
+                        if j + self.pieceCol + dx < 0 or j + self.pieceCol + dx > self.width - 1:  #should be 'or', not 'and'?
                             return True, self.CollisionTypeEnum.wall
                         elif i + self.pieceRow + dy > self.height - 1:
                             return True, self.CollisionTypeEnum.floor
                         elif self.boardSquares[i + self.pieceRow + dy][j + self.pieceCol + dx].color != gray:
-                            return True, self.CollisionTypeEnum.piece
+                            return True, self.CollisionTypeEnum.pieceBelows
+                    elif i + dy == self.currentPiece.height and i + dy > -1:
+                        if i + self.pieceRow + dy > self.height - 1:
+                            return True, self.CollisionTypeEnum.floor
+                        elif self.boardSquares[i + self.pieceRow + dy][j + self.pieceCol + dx].color != gray:
+                            return True, self.CollisionTypeEnum.pieceBelow
+                    # This elif statement checks for collisions on the leftmost and rightmost columns of blocks in a piece
+                    elif j + dx == self.currentPiece.width or j + dx == -1:
+                        if j + self.pieceCol + dx < 0 or j + self.pieceCol + dx > self.width - 1:  #should be 'or', not 'and'?
+                            return True, self.CollisionTypeEnum.wall
+                        elif self.boardSquares[i + self.pieceRow + dy][j + self.pieceCol + dx].color != gray:
+                            return True, self.CollisionTypeEnum.pieceSide
+                    
+                        
         return False, None
 
     def act_on_piece(self, dx, dy):
