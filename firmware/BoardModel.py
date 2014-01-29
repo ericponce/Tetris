@@ -1,4 +1,4 @@
-import pieces, board, random
+import pieces, board, random, copy
 
 
 gray = (100, 100, 100)
@@ -61,20 +61,34 @@ class BoardModel:
         self.pieceCol = 3
         self.pieceRow = 0
 
+    def check_rotate(self):
+        #makes a copy of self.currentPiece so that changing rotatedPiece doesn't mess up self.currentPiece
+        rotatedPiece = copy.deepcopy(self.currentPiece)
+        #rotates rotatedPiece so that we have a copy of what spaces self.currentPiece will rotate into
+        rotatedPiece.blockArray = self.currentPiece.rotate()
+        #returns True if a block from the rotate piece will rotate into an existing colored block below it
+        for i in range(rotatedPiece.height):
+            for j in range(rotatedPiece.width):
+                if rotatedPiece.blockArray[i][j] and self.boardSquares[i + self.pieceRow][j + self.pieceCol].color != gray and not self.currentPiece.blockArray[i][j]:
+                    return True
+        #returns False if there are only gray squares below the rotating piece
+        return False
+
     def rotate_piece(self):
-        if self._will_collide(0,0):
+        #checks if rotating the piece will cause it to overlap with an existing colored square
+        #if rotation will cause an overlap, then the piece does not rotate
+        if not self.check_rotate():
             self.clear_piece() #Try a different way to do this
             self.currentPiece.blockArray = self.currentPiece.rotate()
             self.draw_piece()
-        else:
-            pass
+            
 
     def _will_collide(self, dx, dy):
         for i in range(self.currentPiece.height):
             for j in range(self.currentPiece.width):
                 if self.currentPiece.blockArray[i][j]:
                     if i + dy < self.currentPiece.height and i + dy > -1 and j + dx < self.currentPiece.width and j + dx >= -1 and not self.currentPiece.blockArray[i + dy][j + dx]:
-                        print "i: " + str(i) + " j: " + str(j) + " dx: " + str(dx) + " dy: " + str(dy)
+                        #print "i: " + str(i) + " j: " + str(j) + " dy: " + str(dy) + " dx: " + str(dx)
                         if j + self.pieceCol + dx < 0 or j + self.pieceCol + dx > self.width - 1:  #should be 'or', not 'and'?
                             return True, self.CollisionTypeEnum.wall
                         elif i + self.pieceRow + dy > self.height - 1:
