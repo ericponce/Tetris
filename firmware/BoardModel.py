@@ -76,8 +76,10 @@ class BoardModel:
                             return True, self.CollisionTypeEnum.wall
                         elif i + self.pieceRow + dy > self.height - 1:
                             return True, self.CollisionTypeEnum.floor
-                        elif self.boardSquares[i + self.pieceRow + dy][j + self.pieceCol + dx].color != gray:
+                        elif self.boardSquares[i + self.pieceRow + dy][j + self.pieceCol + dx].color != gray and dy == 1:
                             return True, self.CollisionTypeEnum.pieceBelow
+                        elif self.boardSquares[i + self.pieceRow][j + self.pieceCol + dx].color != gray and abs(dx) == 1:
+                            return True, self.CollisionTypeEnum.pieceSide
                     #These additional elif statements are used for the case in which there is a colored square on the edge
                     #piece's 3x3 or 4x4
                     elif i + dy == self.currentPiece.height and i + dy > -1:

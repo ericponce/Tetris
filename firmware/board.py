@@ -76,6 +76,7 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed):
 
     reset = False
     while stop == False:
+        stop,pause = event_check(board, stop, pause)
         if stop == False and pause == False:
 
             if not board.boardModel.activePiece:
