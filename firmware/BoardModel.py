@@ -70,7 +70,7 @@ class BoardModel:
         for i in range(self.currentPiece.height):
             for j in range(self.currentPiece.width):
                 if self.currentPiece.blockArray[i][j]:
-                    if i + dy < self.currentPiece.height and i + dy > -1 and j + dx < self.currentPiece.width and j + dx > -1 and not self.currentPiece.blockArray[i + dy][j + dx]:
+                    if i + dy < self.currentPiece.height and i + dy > -1 and j + dx < self.currentPiece.width and j + dx >= -1 and not self.currentPiece.blockArray[i + dy][j + dx]:
                         print "i: " + str(i) + " j: " + str(j) + " dx: " + str(dx) + " dy: " + str(dy)
                         if j + self.pieceCol + dx < 0 or j + self.pieceCol + dx > self.width - 1:  #should be 'or', not 'and'?
                             return True, self.CollisionTypeEnum.wall
