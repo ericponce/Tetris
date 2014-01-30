@@ -69,6 +69,10 @@ class BoardModel:
         self.pieceCol = 3
         self.pieceRow = 0
 
+    def hard_drop(self):
+        while self.activePiece:
+            self.act_on_piece(0, 1)
+
     def check_rotate(self):
         #makes a copy of self.currentPiece so that changing rotatedPiece doesn't mess up self.currentPiece
         rotatedPiece = copy.deepcopy(self.currentPiece)
@@ -171,7 +175,7 @@ class BoardModel:
 
     def check_lines(self):
         lines = []
-        for i in range(self.height-1):
+        for i in range(self.height):
             line = [i]
             colors = []
             for j in range(self.width):

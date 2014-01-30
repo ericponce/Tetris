@@ -132,6 +132,8 @@ def event_check(board, stop, pause, reset):
                     board.boardModel.act_on_piece(1, 0)
                 elif event.key == pygame.K_LEFT:
                     board.boardModel.act_on_piece(-1, 0)
+                elif event.key == pygame.K_DOWN:
+                    board.boardModel.hard_drop()
                 
     return stop, pause, reset
 
