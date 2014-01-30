@@ -13,7 +13,6 @@ class PieceBag:
             self.bag.append(random.randint(0, 6))
 
         self.remaining = 7
-        pass
 
     def get_next_piece(self):
         self.remaining -= 1;
@@ -56,7 +55,7 @@ class BoardModel:
     def new_piece(self):
         if not self.pieceBag.remaining:
             self.pieceBag.refill_bag()
-        self.currentPiece = pieces.get_piece(self.pieceBag.get_next_piece())
+        self.currentPiece = pieces.get_piece(1) #should be self.pieceBag.get_next_piece() inside get_piece function
         self.activePiece = True
         self.pieceCol = 3
         self.pieceRow = 0
@@ -71,7 +70,10 @@ class BoardModel:
             for j in range(rotatedPiece.width):
                 if rotatedPiece.blockArray[i][j] and self.boardSquares[i + self.pieceRow][j + self.pieceCol].color != gray and not self.currentPiece.blockArray[i][j]:
                     return True
-        #returns False if there are only gray squares below the rotating piece
+                #checks if the rotation will cause the piece to collide with the wall
+                elif rotatedPiece.blockArray[i][j] and j + self.pieceCol < 0 or j + self.pieceCol > self.width - 1:
+                    return True
+        #returns False if there are only gray squares below the rotating piece and there is not a wall blocking the rotation
         return False
 
     def rotate_piece(self):
@@ -90,33 +92,40 @@ class BoardModel:
                     if i + dy < self.currentPiece.height and i + dy > -1 and j + dx < self.currentPiece.width and j + dx >= -1 and not self.currentPiece.blockArray[i + dy][j + dx]:
                         #print "i: " + str(i) + " j: " + str(j) + " dy: " + str(dy) + " dx: " + str(dx)
                         if j + self.pieceCol + dx < 0 or j + self.pieceCol + dx > self.width - 1:  #should be 'or', not 'and'?
-                            return True, self.CollisionTypeEnum.wall
+                            return True, self.CollisionTypeEnum.wall, False
                         elif i + self.pieceRow + dy > self.height - 1:
-                            return True, self.CollisionTypeEnum.floor
+                            return True, self.CollisionTypeEnum.floor, False
                         elif self.boardSquares[i + self.pieceRow + dy][j + self.pieceCol + dx].color != gray and dy == 1:
-                            return True, self.CollisionTypeEnum.pieceBelow
+                            #checks to see if the user has lost the game
+                            for row in range(3):
+                                for col in range(len(self.boardSquares[row])):
+                                    if self.boardSquares[row][col].color != gray:
+                                        return True, self.CollisionTypeEnum.pieceBelow, True
+                            #if the user has not lost the game, then returns a normal pieceBelow collision
+                            return True, self.CollisionTypeEnum.pieceBelow, False
                         elif self.boardSquares[i + self.pieceRow][j + self.pieceCol + dx].color != gray and abs(dx) == 1:
-                            return True, self.CollisionTypeEnum.pieceSide
-                    #These additional elif statements are used for the case in which there is a colored square on the edge
+                            return True, self.CollisionTypeEnum.pieceSide, False
+                    #These additional elif statements are used for the case in which there is a colored square on the edge of the
                     #piece's 3x3 or 4x4
                     elif i + dy == self.currentPiece.height and i + dy > -1:
                         if i + self.pieceRow + dy > self.height - 1:
-                            return True, self.CollisionTypeEnum.floor
+                            return True, self.CollisionTypeEnum.floor, False
                         elif self.boardSquares[i + self.pieceRow + dy][j + self.pieceCol + dx].color != gray:
-                            return True, self.CollisionTypeEnum.pieceBelow
+                            return True, self.CollisionTypeEnum.pieceBelow, False
                     # This elif statement checks for collisions on the leftmost and rightmost columns of blocks in a piece
                     elif j + dx == self.currentPiece.width or j + dx == -1:
                         if j + self.pieceCol + dx < 0 or j + self.pieceCol + dx > self.width - 1:  #should be 'or', not 'and'?
-                            return True, self.CollisionTypeEnum.wall
+                            return True, self.CollisionTypeEnum.wall, False
                         elif self.boardSquares[i + self.pieceRow + dy][j + self.pieceCol + dx].color != gray:
-                            return True, self.CollisionTypeEnum.pieceSide
+                            return True, self.CollisionTypeEnum.pieceSide, False
                     
                         
-        return False, None
+        return False, None, False
 
     def act_on_piece(self, dx, dy):
+        endGame = False
         if self.activePiece:
-            willCollide, collisionType = self._will_collide(dx, dy)
+            willCollide, collisionType, endGame = self._will_collide(dx, dy)
             if willCollide:
                 if collisionType != self.CollisionTypeEnum.wall:
                     self.activePiece = False
@@ -127,6 +136,8 @@ class BoardModel:
                 self.pieceRow += dy
                 self.pieceCol += dx
                 self.draw_piece()
+
+        return endGame
 
 
     def draw_piece(self):
@@ -143,6 +154,11 @@ class BoardModel:
             for j in range(self.currentPiece.width):
                 if self.currentPiece.blockArray[i][j]:
                     self.boardSquares[i + self.pieceRow][j + self.pieceCol].set_color(gray)
+
+    def clear_board(self, height, width):
+        for i in range(height):
+            for j in range(width):
+                self.boardSquares[i][j].set_color(gray)
 
     def check_lines(self):
         lines = []

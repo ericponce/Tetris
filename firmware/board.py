@@ -76,31 +76,39 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed):
 
     reset = False
     while stop == False:
-        stop,pause = event_check(board, stop, pause)
+        stop, pause, reset = event_check(board, stop, pause, reset)
         if stop == False and pause == False:
 
             if not board.boardModel.activePiece:
                 print "Getting new piece"
                 board.boardModel.new_piece()
 
-            stop,pause = event_check(board, stop, pause)
+            stop, pause, reset = event_check(board, stop, pause, reset)
 
-            board.boardModel.act_on_piece(0, 1)
+            #endGame will remain false until one or more of the top three rows contain a colored square(s)
+            endGame = board.boardModel.act_on_piece(0, 1)
 
             board.squares.draw(screen)
             draw_grid(screen, board.width, board.height)
 
-            update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit"], board.width)
+            #displays Game Over message and pauses game is endGame is true
+            if endGame:
+                update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit", "GAME OVER", "Press 'R' to Try Again"], board.width)
+                pause = True
+            else:
+                update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit", "Press 'R' to Reset"], board.width)
 
             pygame.display.flip()
             clock.tick(10 * speed)
 
-    if reset:
-        new_game()
+        #creates new game when reset is true by making all squares on board gray, and then calling new_board() to start a new game
+        if reset:
+            board.boardModel.clear_board(board.height, board.width)
+            new_board()
     pygame.quit()
 
 #made it a separate time so events can be checked more than once for fall
-def event_check(board, stop, pause):
+def event_check(board, stop, pause, reset):
     for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 stop = True
@@ -111,13 +119,17 @@ def event_check(board, stop, pause):
                 elif event.key == pygame.K_q:
                     stop = True
                     pygame.quit()
+                elif event.key == pygame.K_r:
+                    pause = False
+                    reset = True
                 elif event.key == pygame.K_UP:
                     board.boardModel.rotate_piece()
                 elif event.key == pygame.K_RIGHT:
                     board.boardModel.act_on_piece(1, 0)
                 elif event.key == pygame.K_LEFT:
                     board.boardModel.act_on_piece(-1, 0)
-    return stop, pause
+                
+    return stop, pause, reset
 
 def random_list(width, height):
     list = {}
