@@ -138,7 +138,7 @@ class BoardModel:
             if willCollide:
                 if collisionType != self.CollisionTypeEnum.wall:
                     self.activePiece = False
-                    lines=self.check_lines()
+                    lines = self.check_lines()
                     self.drop_lines(lines)
             else:
                 self.clear_piece()
@@ -171,7 +171,7 @@ class BoardModel:
 
     def check_lines(self):
         lines = []
-        for i in range(self.height-1,0,-1):
+        for i in range(self.height-1):
             line = [i]
             colors = []
             for j in range(self.width):
