@@ -49,13 +49,22 @@ class BoardModel:
         self.pieceRow = 0
         self.pieceCol = 0
 
+        self.nextPiece = None
+
     def get_square(self, x, y):
         return self.boardSquares[y][x]
 
-    def new_piece(self):
+    def next_piece(self):
         if not self.pieceBag.remaining:
             self.pieceBag.refill_bag()
-        self.currentPiece = pieces.get_piece(self.pieceBag.get_next_piece())
+
+        self.currentPiece = self.nextPiece
+        self.nextPiece = pieces.get_piece(self.pieceBag.get_next_piece())
+
+    def new_piece(self):
+        while self.currentPiece == None:
+            self.next_piece()
+        self.next_piece()
         self.activePiece = True
         self.pieceCol = 3
         self.pieceRow = 0

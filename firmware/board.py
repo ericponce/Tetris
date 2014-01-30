@@ -30,19 +30,19 @@ def get_row_top_loc(rowNum, height = HEIGHT):
 def get_col_left_loc(colNum, width = WIDTH):
     return colNum * width + 10
 
-def update_line(screen, message, width = 10, messageNum = 1):
+def update_line(screen, message, width = 10, height = 1, messageNum = 1):
     textSize = 20
     font = pygame.font.Font(None, 20)
-    textY = 0 + textSize * messageNum
+    textY = 10 + height + textSize * messageNum
     text = font.render(message, True, white, black)
     textRect = text.get_rect()
     textRect.x = (width + 1) * WIDTH + 10
     textRect.centery = textY
     screen.blit(text, textRect)
 
-def update_text(screen, messages, width = 10):
+def update_text(screen, messages, width = 10, height = 1):
     for i in range(len(messages)):
-        update_line(screen, messages[i], width, i + 1)
+        update_line(screen, messages[i], width, height, i + 1)
 
 def new_board(width = 10, height = 22, speed = 0.5):
     pygame.init()
@@ -73,6 +73,7 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed):
     board.squares.draw(screen)
     draw_grid(screen, board.width, board.height)
     pygame.display.flip()
+    q = QueueViewer(board.width, 120, 120);
 
     reset = False
     while stop == False:
@@ -82,6 +83,8 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed):
             if not board.boardModel.activePiece:
                 print "Getting new piece"
                 board.boardModel.new_piece()
+                q.set_next_piece(board.boardModel.nextPiece)
+                q.draw(screen)
 
             stop, pause, reset = event_check(board, stop, pause, reset)
 
@@ -93,10 +96,11 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed):
 
             #displays Game Over message and pauses game is endGame is true
             if endGame:
-                update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit", "Press 'R' to Try Again", "GAME OVER"], board.width)
+                update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit", "Press 'R' to Try Again", "GAME OVER"], board.width, 120)
                 pause = True
             else:
-                update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit", "Press 'R' to Reset"], board.width)
+                update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit", "Press 'R' to Reset"], board.width, 120)
+                pass
 
             pygame.display.flip()
             clock.tick(10 * speed)
@@ -140,12 +144,66 @@ def random_list(width, height):
         list[(c, r)] = i
     return list
 
+class QueueViewer(pygame.sprite.Sprite):
+    def __init__(self, boardWidth, viewerWidth, viewerHeight):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface([viewerWidth, viewerHeight])
+        self.image.fill(blue)
+        self.piece = None
+
+        self.rect = self.image.get_rect()
+        self.rect.x = get_col_left_loc(boardWidth + 1)
+        self.rect.y = 10
+
+        self.width = viewerWidth
+        self.height = viewerHeight
+
+        self.queueSprite = pygame.sprite.RenderPlain()
+        self.queueSprite.add(self)
+
+    def draw(self, screen):
+        self.queueSprite.draw(screen)
+        self.squares.draw(screen)
+        self.__draw_outline(screen)
+
+    def set_next_piece(self, piece):
+        self.piece = piece
+        self.__create_grid()
+
+    def __draw_outline(self, screen):
+        pygame.draw.line(screen, gray, (self.rect.x, self.rect.y), (self.rect.x + self.width, self.rect.y)) #Top
+        pygame.draw.line(screen, gray, (self.rect.x, self.rect.y + self.width), (self.rect.x + self.width, self.rect.y + self.height)) #Bottom
+        pygame.draw.line(screen, gray, (self.rect.x, self.rect.y), (self.rect.x, self.rect.y + self.height)) #Left
+        pygame.draw.line(screen, gray, (self.rect.x + self.width, self.rect.y), (self.rect.x + self.width, self.rect.y + self.height)) #Right
+
+    def __create_grid(self):
+        self.squares = pygame.sprite.RenderPlain()
+        if (self.piece.height == self.piece.width):
+            for i in range(self.piece.height):
+                for j in range(self.piece.width):
+                    s = Square(i, j, (self.piece.color if self.piece.blockArray[i][j] else black), self.width/self.piece.width, self.height/self.piece.height)
+                    s.rect.x = self.rect.x + self.width/self.piece.width * j;
+                    s.rect.y = self.rect.y + self.height/self.piece.height * i;
+                    self.squares.add(s)
+        else:
+            size = (self.piece.width if self.piece.width > self.piece.height else self.piece.height)
+
+            for i in range(size):
+                for j in range(size):
+                    s = Square(i, j, (self.piece.color if i < self.piece.height and j < self.piece.width and self.piece.blockArray[i][j] else black), self.width/self.piece.width, self.height/self.piece.height)
+                    s.rect.x = self.rect.x + self.width/self.piece.width * j;
+                    s.rect.y = self.rect.y + self.height/self.piece.height * i;
+                    self.squares.add(s)
+
+
 class Square(pygame.sprite.Sprite):
-    def __init__(self, row, col, color):
+    def __init__(self, row, col, color, width = WIDTH, height = HEIGHT):
         pygame.sprite.Sprite.__init__(self)
         self.row = row
         self.col = col
-        self.image = pygame.Surface([WIDTH, HEIGHT])
+        self.width = width
+        self.height = height
+        self.image = pygame.Surface([width, height])
         self.image.fill(color)
         self.color = color
         self.rect = self.image.get_rect()
@@ -154,7 +212,7 @@ class Square(pygame.sprite.Sprite):
         self.rect.y = get_row_top_loc(row)
 
     def get_rect_from_square(self):
-        return pygame.Rect(get_col_left_loc(self.col), get_row_top_loc(self.row), WIDTH, HEIGHT)
+        return pygame.Rect(get_col_left_loc(self.col), get_row_top_loc(self.row), self.width, self.height)
 
     def set_color(self, color):
         self.color = color;
