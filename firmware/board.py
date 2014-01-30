@@ -93,7 +93,7 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed):
 
             #displays Game Over message and pauses game is endGame is true
             if endGame:
-                update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit", "GAME OVER", "Press 'R' to Try Again"], board.width)
+                update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit", "Press 'R' to Try Again", "GAME OVER"], board.width)
                 pause = True
             else:
                 update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit", "Press 'R' to Reset"], board.width)

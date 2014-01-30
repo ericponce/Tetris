@@ -55,7 +55,7 @@ class BoardModel:
     def new_piece(self):
         if not self.pieceBag.remaining:
             self.pieceBag.refill_bag()
-        self.currentPiece = pieces.get_piece(1) #should be self.pieceBag.get_next_piece() inside get_piece function
+        self.currentPiece = pieces.get_piece(self.pieceBag.get_next_piece())
         self.activePiece = True
         self.pieceCol = 3
         self.pieceRow = 0
