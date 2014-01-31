@@ -4,6 +4,16 @@ import pieces, BoardModel
 
 WIDTH = 25
 HEIGHT = 25
+try:
+    infile=open('HighScore','r')
+    BEST_SCORE=infile.read()
+    if BEST_SCORE == '':
+        BEST_SCORE = 0
+    infile.close()
+except:
+    outfile=open('HighScore','w')
+    outfile.close()
+    BEST_SCORE = 0
 
 black = (0, 0, 0)
 gray = (100, 100, 100)
@@ -69,7 +79,7 @@ def draw_grid(screen, width, height):
     for i in range(height + 1):
         pygame.draw.line(screen, red, (10, i * HEIGHT + 10), (WIDTH * width + 10, i * HEIGHT + 10))
 
-def main_loop(screen, board, moveCount, clock, stop, pause, speed):
+def main_loop(screen, board, moveCount, clock, stop, pause, speed, bestScore=BEST_SCORE):
     board.squares.draw(screen)
     draw_grid(screen, board.width, board.height)
     pygame.display.flip()
@@ -96,10 +106,10 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed):
 
             #displays Game Over message and pauses game is endGame is true
             if endGame:
-                update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit", "Press 'R' to Try Again", "Score: " + str(board.boardModel.score), "GAME OVER"], board.width, 120)
+                update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit", "Press 'R' to Try Again", "Score: " + str(board.boardModel.score), 'Best Score: ' + str(bestScore), "GAME OVER"], board.width, 120)
                 pause = True
             else:
-                update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit", "Press 'R' to Reset", "Score: " + str(board.boardModel.score)], board.width, 120)
+                update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit", "Press 'R' to Reset", "Score: " + str(board.boardModel.score),'Best Score: ' + str(bestScore)], board.width, 120)
                 pass
             if board.boardModel.score >= 10:
                 speed += int(board.boardModel.score / 100)
@@ -110,6 +120,11 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed):
         if reset:
             board.boardModel.clear_board(board.height, board.width)
             new_board()
+    if board.boardModel.score > int(bestScore):
+        bestScore = board.boardModel.score
+    outfile = open('HighScore', 'w')
+    outfile.write(str(bestScore))
+    outfile.close()
     pygame.quit()
 
 #made it a separate time so events can be checked more than once for fall
