@@ -43,8 +43,6 @@ class BoardModel:
             for j in range(width):
                 self.boardSquares[i].append(board.Square(i, j, gray))
 
-        print self.boardSquares
-
         self.activePiece = False
         self.currentPiece = None
         self.pieceRow = 0

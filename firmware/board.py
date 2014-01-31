@@ -111,10 +111,9 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed, bestScore=BES
             else:
                 update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit", "Press 'R' to Reset", "Score: " + str(board.boardModel.score),'Best Score: ' + str(bestScore)], board.width, 120)
                 pass
-            if board.boardModel.score >= 10:
-                speed += int(board.boardModel.score / 100)
+            
             pygame.display.flip()
-            clock.tick(10 * speed)
+            clock.tick(board.boardModel.score / 20.0 + 4)
 
         #creates new game when reset is true by making all squares on board gray, and then calling new_board() to start a new game
         if reset:
