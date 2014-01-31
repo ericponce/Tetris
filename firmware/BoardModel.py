@@ -31,6 +31,7 @@ class BoardModel:
         pieceBelow = 2
 
     def __init__(self, width, height):
+        self.score = 0
         self.width = width
         self.height = height
         self.pieceBag = PieceBag()
@@ -189,6 +190,7 @@ class BoardModel:
         return lines
 
     def clear_line(self,line):
+        self.score+=1
         for square in line[1:]:
             square.set_color(gray)
 

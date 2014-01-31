@@ -44,7 +44,7 @@ def update_text(screen, messages, width = 10, height = 1):
     for i in range(len(messages)):
         update_line(screen, messages[i], width, height, i + 1)
 
-def new_board(width = 10, height = 22, speed = 0.5):
+def new_board(width = 10, height = 22, speed = 0.4):
     pygame.init()
 
     window_size = [width * WIDTH + 200, height * HEIGHT + 20]
@@ -96,12 +96,13 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed):
 
             #displays Game Over message and pauses game is endGame is true
             if endGame:
-                update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit", "Press 'R' to Try Again", "GAME OVER"], board.width, 120)
+                update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit", "Press 'R' to Try Again", "Score: " + str(board.boardModel.score), "GAME OVER"], board.width, 120)
                 pause = True
             else:
-                update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit", "Press 'R' to Reset"], board.width, 120)
+                update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit", "Press 'R' to Reset", "Score: " + str(board.boardModel.score)], board.width, 120)
                 pass
-
+            if board.boardModel.score >= 10:
+                speed += int(board.boardModel.score / 100)
             pygame.display.flip()
             clock.tick(10 * speed)
 
