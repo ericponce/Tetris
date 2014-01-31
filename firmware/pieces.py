@@ -10,6 +10,8 @@ red = (255, 0, 0)
 blue = (0, 0, 255)
 orange = (255, 125, 0)
 
+
+# Part of Model. Has piece information and handles rotation. All pieces extend this class.
 class Pieces:
     def rotate(self):
         rotationArray=[]
@@ -91,7 +93,7 @@ class PieceZ (Pieces):
                          [False,True,True],
                          [False,False,False]]
 
-#Pieces put into tuple to be called by index number
+# Used for getting piece instance
 PIECES = ('PieceJ', 'PieceI', 'PieceL', 'PieceO', 'PieceS', 'PieceT', 'PieceZ')
 
 def get_piece(index):

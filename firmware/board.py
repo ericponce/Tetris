@@ -4,14 +4,15 @@ import pieces, BoardModel
 
 WIDTH = 25
 HEIGHT = 25
+
 try:
-    infile=open('HighScore','r')
-    BEST_SCORE=infile.read()
+    infile = open('HighScore', 'r')
+    BEST_SCORE = infile.read()
     if BEST_SCORE == '':
         BEST_SCORE = 0
     infile.close()
 except:
-    outfile=open('HighScore','w')
+    outfile = open('HighScore', 'w')
     outfile.close()
     BEST_SCORE = 0
 
@@ -26,20 +27,17 @@ red = (255, 0, 0)
 blue = (0, 0, 255)
 orange = (255, 125, 0)
 
-colors = (  cyan,
-            yellow,
-            purple,
-            green,
-            red,
-            blue,
-            orange)
 
+
+# Used for positional data
 def get_row_top_loc(rowNum, height = HEIGHT):
     return rowNum * height + 10
     
+# Used for position data
 def get_col_left_loc(colNum, width = WIDTH):
     return colNum * width + 10
 
+# Print out a line of text on the right corner
 def update_line(screen, message, width = 10, height = 1, messageNum = 1):
     textSize = 20
     font = pygame.font.Font(None, 20)
@@ -50,10 +48,12 @@ def update_line(screen, message, width = 10, height = 1, messageNum = 1):
     textRect.centery = textY
     screen.blit(text, textRect)
 
+# Print out multiple lines of text
 def update_text(screen, messages, width = 10, height = 1):
     for i in range(len(messages)):
         update_line(screen, messages[i], width, height, i + 1)
 
+# Create new board and thereofre a new game
 def new_board(width = 10, height = 22, speed = 0.4):
     pygame.init()
 
@@ -72,6 +72,7 @@ def new_board(width = 10, height = 22, speed = 0.4):
 
     main_loop(screen, board, moveCount, clock, False, False, speed)
 
+# Draw grids for the board
 def draw_grid(screen, width, height):
 
     for i in range(width + 1):
@@ -79,6 +80,7 @@ def draw_grid(screen, width, height):
     for i in range(height + 1):
         pygame.draw.line(screen, red, (10, i * HEIGHT + 10), (WIDTH * width + 10, i * HEIGHT + 10))
 
+# Main logic and drawing loop
 def main_loop(screen, board, moveCount, clock, stop, pause, speed, bestScore=BEST_SCORE):
     board.squares.draw(screen)
     draw_grid(screen, board.width, board.height)
@@ -91,7 +93,6 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed, bestScore=BES
         if stop == False and pause == False:
 
             if not board.boardModel.activePiece:
-                print "Getting new piece"
                 board.boardModel.new_piece()
                 q.set_next_piece(board.boardModel.nextPiece)
                 q.draw(screen)
@@ -106,10 +107,10 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed, bestScore=BES
 
             #displays Game Over message and pauses game is endGame is true
             if endGame:
-                update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit", "Press 'R' to Try Again", "Score: " + str(board.boardModel.score), 'Best Score: ' + str(bestScore), "GAME OVER"], board.width, 120)
+                update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", " Q to quit ", " Press 'R' to Try Again ", " Score: " + str(board.boardModel.score) + " ", " Best Score: " + str(bestScore) + " ", " GAME OVER "], board.width, 120)
                 pause = True
             else:
-                update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", "Q to quit", "Press 'R' to Reset", "Score: " + str(board.boardModel.score),'Best Score: ' + str(bestScore)], board.width, 120)
+                update_text(screen, [" Tetris ", " LEFT/RIGHT to move ", " UP to rotate ", " Q to quit ", " Press 'R' to Reset ", " Score: " + str(board.boardModel.score) + " ", " Best Score: " + str(bestScore) + " "], board.width, 120)
                 pass
             
             pygame.display.flip()
@@ -126,7 +127,7 @@ def main_loop(screen, board, moveCount, clock, stop, pause, speed, bestScore=BES
     outfile.close()
     pygame.quit()
 
-#made it a separate time so events can be checked more than once for fall
+# Check for keyboard events
 def event_check(board, stop, pause, reset):
     for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -152,15 +153,7 @@ def event_check(board, stop, pause, reset):
                 
     return stop, pause, reset
 
-def random_list(width, height):
-    list = {}
-    for i in range(10):
-        c = random.randint(0, width - 1)
-        r = random.randint(0, height - 1)
-        i = random.randint(0, len(colors) - 1)
-        list[(c, r)] = i
-    return list
-
+# Used for next piece display. A sprite containing a grid.
 class QueueViewer(pygame.sprite.Sprite):
     def __init__(self, boardWidth, viewerWidth, viewerHeight):
         pygame.sprite.Sprite.__init__(self)
@@ -212,7 +205,7 @@ class QueueViewer(pygame.sprite.Sprite):
                     s.rect.y = self.rect.y + self.height/self.piece.height * i;
                     self.squares.add(s)
 
-
+# Used for display block type objects
 class Square(pygame.sprite.Sprite):
     def __init__(self, row, col, color, width = WIDTH, height = HEIGHT):
         pygame.sprite.Sprite.__init__(self)
@@ -237,6 +230,7 @@ class Square(pygame.sprite.Sprite):
     def is_empty(self):
         return self.color == gray
 
+# Stores square sprites and handles communication to BoardModel. Controller in MVC
 class Board:
     def __init__(self, width, height):
         self.width = width
@@ -260,7 +254,7 @@ class Board:
                 self.squares.add(self.boardModel.get_square(i, j))
 
         
-
+# Main
 if __name__ == "__main__":
     new_board()
 

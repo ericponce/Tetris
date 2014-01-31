@@ -1,8 +1,8 @@
 import pieces, board, random, copy
 
-
 gray = (100, 100, 100)
 
+#Used fo rgenerating list of next pieces
 class PieceBag:
     def __init__(self):
         self.bag=[]
@@ -22,8 +22,10 @@ class PieceBag:
     def remaining_pieces(self):
         return self.remaining
 
+# Cpntains the array of blocks. Handles game logic. Model in MVC structure
 class BoardModel:
 
+    #Enum for describing type of collision
     class CollisionTypeEnum:
         wall = 0
         pieceSide = 0
@@ -53,6 +55,7 @@ class BoardModel:
     def get_square(self, x, y):
         return self.boardSquares[y][x]
 
+    #Grab the next piece to be dropped
     def next_piece(self):
         if not self.pieceBag.remaining:
             self.pieceBag.refill_bag()
@@ -68,10 +71,12 @@ class BoardModel:
         self.pieceCol = 3
         self.pieceRow = 0
 
+    #Hard drop function
     def hard_drop(self):
         while self.activePiece:
             self.act_on_piece(0, 1)
 
+    # check if rotation is possible
     def check_rotate(self):
         #makes a copy of self.currentPiece so that changing rotatedPiece doesn't mess up self.currentPiece
         rotatedPiece = copy.deepcopy(self.currentPiece)
@@ -88,6 +93,7 @@ class BoardModel:
         #returns False if there are only gray squares below the rotating piece and there is not a wall blocking the rotation
         return False
 
+    # Rotate a the current piece
     def rotate_piece(self):
         #checks if rotating the piece will cause it to overlap with an existing colored square
         #if rotation will cause an overlap, then the piece does not rotate
@@ -96,13 +102,12 @@ class BoardModel:
             self.currentPiece.blockArray = self.currentPiece.rotate()
             self.draw_piece()
             
-
+    # Check for collision
     def _will_collide(self, dx, dy):
         for i in range(self.currentPiece.height):
             for j in range(self.currentPiece.width):
                 if self.currentPiece.blockArray[i][j]:
                     if i + dy < self.currentPiece.height and i + dy > -1 and j + dx < self.currentPiece.width and j + dx >= -1 and not self.currentPiece.blockArray[i + dy][j + dx]:
-                        #print "i: " + str(i) + " j: " + str(j) + " dy: " + str(dy) + " dx: " + str(dx)
                         if j + self.pieceCol + dx < 0 or j + self.pieceCol + dx > self.width - 1:  #should be 'or', not 'and'?
                             return True, self.CollisionTypeEnum.wall, False
                         elif i + self.pieceRow + dy > self.height - 1:
@@ -129,11 +134,10 @@ class BoardModel:
                         if j + self.pieceCol + dx < 0 or j + self.pieceCol + dx > self.width - 1:  #should be 'or', not 'and'?
                             return True, self.CollisionTypeEnum.wall, False
                         elif self.boardSquares[i + self.pieceRow + dy][j + self.pieceCol + dx].color != gray:
-                            return True, self.CollisionTypeEnum.pieceSide, False
-                    
-                        
+                            return True, self.CollisionTypeEnum.pieceSide, False        
         return False, None, False
 
+    # Act on piece given an dx and dy
     def act_on_piece(self, dx, dy):
         endGame = False
         if self.activePiece:
@@ -148,18 +152,13 @@ class BoardModel:
                 self.pieceRow += dy
                 self.pieceCol += dx
                 self.draw_piece()
-
         return endGame
-
 
     def draw_piece(self):
         for i in range(self.currentPiece.height):
             for j in range(self.currentPiece.width):
                 if self.currentPiece.blockArray[i][j]:
-                    try:
-                        self.boardSquares[i + self.pieceRow][j + self.pieceCol].set_color(self.currentPiece.color)
-                    except IndexError:
-                        print "X: " + str(j + self.pieceCol) + " Y: " + str(i + self.pieceRow)
+                    self.boardSquares[i + self.pieceRow][j + self.pieceCol].set_color(self.currentPiece.color)
 
     def clear_piece(self):
         for i in range(self.currentPiece.height):
@@ -172,6 +171,9 @@ class BoardModel:
             for j in range(width):
                 self.boardSquares[i][j].set_color(gray)
 
+    ##################
+    # Line completion#
+    ##################
     def check_lines(self):
         lines = []
         for i in range(self.height):
